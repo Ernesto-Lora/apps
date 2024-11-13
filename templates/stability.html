@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rolling Center</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        /* Optional: Hide the schema container by default */
+        
+    </style>
+</head>
+<body>
+    <h1>Rolling Center</h1>
+
+    <div id="content">
+        <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Generate</button>
+        </form>
+
+        <!-- Toggle Button -->
+        <button id="toggle-button" onclick="toggleSchema()">Show Schema</button>
+
+        <!-- Schema Image Container -->
+        <div id="schema-container">
+            <img src="/static/stability/schema.svg" alt="Rolling Center Schema">
+        </div>
+
+        {% if image_base64 %}
+        <div>
+            <img src="data:image/png;base64,{{ image_base64 }}" alt="Suspension Image">
+            <p>The Roll Center is on: x = {{roll_center_x}}, y = {{roll_center_y}}</p>
+            <p>The Gravity Center is on: x = {{gravity_center_x}}, y = {{gravity_center_y}}</p>
+        </div>
+        {% endif %}
+
+        {% if max1 %}
+        <div>
+            <p>The physical maximul velocity is {{max1}} m/s </p>
+            <p>The velocity for when the car has maximum roll ange is {{max2}} m/s</p>
+        </div>
+        {% endif %}
+
+
+    </div>
+    
+    <script>
+        // JavaScript function to toggle schema visibility
+        function toggleSchema() {
+            const schemaContainer = document.getElementById("schema-container");
+            const toggleButton = document.getElementById("toggle-button");
+
+            if (schemaContainer.style.display === "none") {
+                schemaContainer.style.display = "block";
+                toggleButton.innerText = "Hide Schema";
+            } else {
+                schemaContainer.style.display = "none";
+                toggleButton.innerText = "Show Schema";
+            }
+        }
+    </script>
+</body>
+</html>
