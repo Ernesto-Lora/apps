@@ -12,15 +12,20 @@
 </head>
 <body>
     <h1>Rolling Center</h1>
-
     <div id="content">
-        <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Generate</button>
-        </form>
 
-        <!-- Toggle Button -->
+        <!-- Form for Input Data -->
+        
+        <form method="post">
+                <div id = "geometry">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                </div>
+            <button type="submit">Generate</button>
+        </form>
+        
+        
+        <!-- Toggle Button for Schema Image -->
         <button id="toggle-button" onclick="toggleSchema()">Show Schema</button>
 
         <!-- Schema Image Container -->
@@ -28,24 +33,18 @@
             <img src="/static/stability/schema.svg" alt="Rolling Center Schema">
         </div>
 
+        <!-- Display Calculated Image and Results -->
         {% if image_base64 %}
-        <div>
-            <img src="data:image/png;base64,{{ image_base64 }}" alt="Suspension Image">
-            <p>The Roll Center is on: x = {{roll_center_x}}, y = {{roll_center_y}}</p>
-            <p>The Gravity Center is on: x = {{gravity_center_x}}, y = {{gravity_center_y}}</p>
+        <div class="output-section">
+            <img id="roll-center-image" src="data:image/png;base64,{{ image_base64 }}" alt="Suspension Image">
+            <p>The <span style="color: green;">Roll Center</span> is on: x = {{ roll_center_x }}, y = {{ roll_center_y }}</p>
+            <p>The <span style="color: blue;">Gravity Center</span> is on: x = {{ gravity_center_x }}, y = {{ gravity_center_y }}</p>
+            <p>The physical maximum velocity is {{ max1 }} m/s</p>
+            <p>The velocity for maximum roll angle is {{ max2 }} m/s</p>
         </div>
         {% endif %}
-
-        {% if max1 %}
-        <div>
-            <p>The physical maximul velocity is {{max1}} m/s </p>
-            <p>The velocity for when the car has maximum roll ange is {{max2}} m/s</p>
-        </div>
-        {% endif %}
-
-
     </div>
-    
+
     <script>
         // JavaScript function to toggle schema visibility
         function toggleSchema() {
