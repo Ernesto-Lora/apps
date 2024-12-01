@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.safestring import mark_safe
+import numpy as np
 
 class SuspensionForm(forms.Form):
     D = forms.FloatField(label='D (m)', initial=1.7)
@@ -13,4 +14,16 @@ class SuspensionForm(forms.Form):
     philb = forms.IntegerField(label=mark_safe('Φ<sub>lb</sub> ( °)') , initial=81)
     phiru = forms.IntegerField(label=mark_safe('Φ<sub>ru</sub> ( °)'), initial=85)
     phirb = forms.IntegerField(label=mark_safe('Φ<sub>rb</sub> ( °)'), initial=81)
-    theta = forms.IntegerField(label=' θ ( °)', initial=0)
+
+class thetaForm(forms.Form):
+    angle = forms.IntegerField(label=' θ ( °)', initial=0)
+
+    def __init__(self, max_rotation=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.max_rotation = max_rotation
+
+    def clean_angle(self):
+        angle = self.cleaned_data['angle']
+        if self.max_rotation is not None and angle > np.rad2deg(self.max_rotation):
+            raise forms.ValidationError(f"Angle must be less than or equal to {self.max_rotation}.")
+        return angle

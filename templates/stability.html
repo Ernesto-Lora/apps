@@ -3,44 +3,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rolling Center</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <style>
-        /* Optional: Hide the schema container by default */
-        
-    </style>
+    <link id="theme-stylesheet" rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <h1>Rolling Center</h1>
     <div id="content">
-
         <!-- Form for Input Data -->
-        
         <form method="post">
-                <div id = "geometry">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                </div>
+            <div id="geometry">
+                {% csrf_token %}
+                {{ geometry_form.as_p }}
+            </div>
             <button type="submit">Generate</button>
         </form>
+
+        <form method="post">
+            <div id="geometry">
+                {% csrf_token %}
+                {{ angle_form.as_p }}
+            </div>
+            <button type="submit">Change Angle</button>
+        </form>
         
-        
+        {% if warnings %}
+            <div><h2 style="color: red;">{{ warnings }}</h2></div>
+        {% endif %}
+
         <!-- Toggle Button for Schema Image -->
         <button id="toggle-button" onclick="toggleSchema()">Show Schema</button>
 
         <!-- Schema Image Container -->
         <div id="schema-container">
-            <img src="/static/stability/schema.svg" alt="Rolling Center Schema">
+            <img src="{% static 'stability/schema.svg' %}" alt="Rolling Center Schema">
         </div>
 
         <!-- Display Calculated Image and Results -->
-        {% if image_base64 %}
+        {% if svg_base64 %}
         <div class="output-section">
-            <img id="roll-center-image" src="data:image/png;base64,{{ image_base64 }}" alt="Suspension Image">
+            <img id="roll-center-image" src="data:image/svg+xml;base64,{{ svg_base64 }}" alt="Suspension Image">
             <p>The <span style="color: green;">Roll Center</span> is on: x = {{ roll_center_x }}, y = {{ roll_center_y }}</p>
             <p>The <span style="color: blue;">Gravity Center</span> is on: x = {{ gravity_center_x }}, y = {{ gravity_center_y }}</p>
-            <p>The physical maximum velocity is {{ max1 }} m/s</p>
-            <p>The velocity for maximum roll angle is {{ max2 }} m/s</p>
+            <p>The <span style="color: red;">Maximum Angle</span> is: {{ max_rotation }} °</p>
         </div>
         {% endif %}
     </div>
@@ -59,6 +64,22 @@
                 toggleButton.innerText = "Show Schema";
             }
         }
+
+        // Dynamically switch styles based on browser color scheme
+        const themeStylesheet = document.getElementById("theme-stylesheet");
+        const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+        function updateTheme(e) {
+            themeStylesheet.href = e.matches 
+                ? "{% static 'css/obscureStyles.css' %}" 
+                : "{% static 'css/styles.css' %}";
+        }
+
+        // Initial check
+        updateTheme(darkModeMediaQuery);
+
+        // Listen for changes
+        darkModeMediaQuery.addEventListener("change", updateTheme);
     </script>
 </body>
 </html>

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-class loads:
+class gravity_center:
     def __init__(self, components = pd.DataFrame()):
         self.components = components
 
@@ -10,7 +10,7 @@ class loads:
         self.components = pd.concat([self.components, components])
         print(self.components)
 
-    def centreGravity(self):
+    def gravity_center(self):
         """
         Compute the center of gravity from a dataframe with component positions and weights.
     

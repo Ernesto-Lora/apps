@@ -16,10 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-import stability.views as hola
-import springUTS.views as hola2
+import stability
+import springUTS.views
+import stability.views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('stability/', hola.app, name = 'stability'),
-    path('springUTS/', hola2.app, name = 'springUTS')
+    path('stability/', stability.views.app2, name = 'stability'),
+    path('springUTS/', springUTS.views.app, name = 'springUTS')
 ]
