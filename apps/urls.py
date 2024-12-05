@@ -22,5 +22,7 @@ import stability.views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('stability/', stability.views.app2, name = 'stability'),
+    path('process_components/', stability.views.process_components, name = 'process_components'),
+    path('components_frontend/', stability.views.components_frontend, name = 'components_frontend'),
     path('springUTS/', springUTS.views.app, name = 'springUTS')
 ]

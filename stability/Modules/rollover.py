@@ -5,16 +5,20 @@ import pandas as pd
 from ..Modules import frontStability, chassis_stiffnes, gravityCenter
 
 class rollover():
-    def __init__(self, center_of_gravity, roll_centre, chassis_stiffness):
+    def __init__(self, center_of_gravity,
+                  roll_centre, max_angle, D,
+                  chassis_stiffness):
         self.center_of_gravity = center_of_gravity
         self.roll_centre = roll_centre
+        self.max_angle = max_angle
+        self.D = D
         self.chassis_stiffness = chassis_stiffness
     
     def distance_center_of_gravity_rolling_centre(self):
         """
         Compute the distance between the Centre of gravity and roll centre
         """
-        dis = self.center_of_gravity.centreGravity() - self.roll_centre.getRollCenter()
+        dis = self.center_of_gravity.gravity_center() - self.roll_centre
         return dis
     
     def roll_angle(self, v, R):
@@ -26,7 +30,7 @@ class rollover():
         v = v*0.277778 #m/s conversion
         total_mass = self.center_of_gravity.totalMass()
         centrifugal_force = total_mass*v**2/R
-        vertical_distance = np.linalg.norm(self.distance_center_of_gravity_rolling_centre()[:1])
+        vertical_distance = np.linalg.norm(self.distance_center_of_gravity_rolling_centre()[:2])
         chassis_stiffness = self.chassis_stiffness.chassis_stiffness()
 
         return (centrifugal_force*vertical_distance)/chassis_stiffness
@@ -36,11 +40,24 @@ class rollover():
         Compute the velocity for maximum angle of rotation
         Radius = R #m
         """
-        max_angle = self.roll_centre.maxRotation()
+        max_angle = self.max_angle
         chassis_stiffness = self.chassis_stiffness.chassis_stiffness()
         total_mass = self.center_of_gravity.totalMass()
-        vertical_distance = self.distance_center_of_gravity_rolling_centre()[1]
+        vertical_distance = np.linalg.norm(self.distance_center_of_gravity_rolling_centre()[:2])
         return np.sqrt((max_angle*chassis_stiffness*R)/(total_mass*vertical_distance))
+    
+    def rotation_curve(self, R, v):
+        """
+        Compute the rotation of the car when is rounding a curve with
+        radius R and travels in a velocity v
+        Radius = R #m
+        velocity = v #km/h
+        """
+        max_angle = self.max_angle
+        chassis_stiffness = self.chassis_stiffness.chassis_stiffness()
+        total_mass = self.center_of_gravity.totalMass()
+        vertical_distance = np.linalg.norm(self.distance_center_of_gravity_rolling_centre()[:2])
+        return (v**2*total_mass*vertical_distance)/(chassis_stiffness*R)
     
     def max_speed_weigth(self, R):
         """
@@ -50,8 +67,8 @@ class rollover():
         Radius = R #m
         """
         g = 9.8
-        d = self.roll_centre.get_D()
-        h = self.center_of_gravity.centreGravity()[1]
+        d = self.D
+        h = self.center_of_gravity.gravity_center()[1]
         return np.sqrt((g*d*R)/(2*h))
     
     def max_speed_weigth_modified(self, R):
@@ -61,8 +78,8 @@ class rollover():
         Radius = R #m
         """
         g = 9.8
-        d = self.roll_centre.get_D()
-        vertical_distance = self.distance_center_of_gravity_rolling_centre()[1]
+        d = self.D
+        vertical_distance = np.linalg.norm(self.distance_center_of_gravity_rolling_centre()[:2])
         return np.sqrt((g*d*R)/(2*vertical_distance))
     def chassisRollAngle(self):
         return

@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.safestring import mark_safe
 import numpy as np
+from django.forms import formset_factory
 
 class SuspensionForm(forms.Form):
     D = forms.FloatField(label='D (m)', initial=1.7)
@@ -27,3 +28,11 @@ class thetaForm(forms.Form):
         if self.max_rotation is not None and angle > np.rad2deg(self.max_rotation):
             raise forms.ValidationError(f"Angle must be less than or equal to {self.max_rotation}.")
         return angle
+    
+class radius_form(forms.Form):
+    radius = forms.FloatField(label='Curve radius R (m)', initial=400)
+
+class velocity_form(forms.Form):
+    radius_for_rotation = forms.FloatField(label='Curve radius R (m)', initial=400)
+    velocity = forms.FloatField(label=' v (km/h)', initial=100)
+    k = forms.FloatField(label=' K (N/m)', initial=12000)

@@ -48,6 +48,39 @@
             <p>The <span style="color: red;">Maximum Angle</span> is: {{ max_rotation }} °</p>
         </div>
         {% endif %}
+
+
+        <form method="post">
+            <div id="Radius">
+                {% csrf_token %}
+                {{ radius_form.as_p }}
+            </div>
+            <button type="submit">Max Velocities</button>
+        </form>
+    
+        {% if max_speed_angle %}
+            <div class="output-section">
+                <p>When rounding a curve of raius R The Maximum velocity with the Roll center Modification is = {{ max_speed_weigth_modified }} km/h</p>
+                
+            </div>
+        {% endif %}
+
+        <form method="post">
+            <div id="velocity">
+                {% csrf_token %}
+                {{ velocity_form.as_p }}
+            </div>
+            <button type="submit">Max Velocities</button>
+        </form>
+        
+        {% if rotation_curve %}
+            <div class="output-section">
+                <p>The rotation with that velocity v and a Rigidity k 
+                    in a curve of radius R is {{ rotation_curve }} °</p>
+            </div>
+        {% endif %}
+    </div>
+
     </div>
 
     <script>

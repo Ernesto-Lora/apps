@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@12.3.0/dist/handsontable.full.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@12.3.0/dist/handsontable.full.min.js"></script>
+
+    <title>Component Input</title>
+</head>
+<body>
+    <h1>Input Car Components</h1>
+    <div id="handsontable"></div>
+    <button id="addRow">Add Row</button>
+    <button id="submit">Submit</button>
+
+    <script>
+        const container = document.getElementById('handsontable');
+        const hot = new Handsontable(container, {
+            data: [
+                ['Front bumper', 13, 0, 0.3, 0],
+                ['Radiator', 60, 0, 0.4, 0.3],
+                ['engine/trans', 85, 0.5, 0.4, 1.1],
+                ['Fuel tanks + luggage', 65, 0.5, 0.45, 3.3],
+                ['Luggage', 50, 0, 0.5, 3.85],
+                ['Rear Bumper', 14, 0, 0.3, 4.2],
+                ['Front Left Corner', 90, -0.7, 0.3, 0],
+                ['Front Right Corner', 90, 0.7, 0.3, 0],
+                ['Rear Left Corner', 125, -0.7, 0.3, 4],
+                ['Rear Right Corner', 125, 0.7, 0.3, 4],
+                ['Caja sonido', 2, 0.3, 0.4, 4]
+            ],
+            colHeaders: ['Name', 'Mass(kg)', 'X', 'Y', 'Z'],
+            rowHeaders: true,
+            columns: [
+                { type: 'text' },
+                { type: 'numeric' },
+                { type: 'numeric' },
+                { type: 'numeric' },
+                { type: 'numeric' },
+            ],
+            licenseKey: 'non-commercial-and-evaluation', // For non-commercial use
+        });
+
+        // Add Row Button
+        document.getElementById('addRow').addEventListener('click', () => {
+            hot.alter('insert_row'); // Inserts a new row at the end
+        });
+
+        // Submit Button
+        document.getElementById('submit').addEventListener('click', () => {
+            const data = hot.getData();
+            fetch('/process_components/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ components: data }),
+            }).then(response => response.json()).then(result => {
+                console.log(result);
+            });
+        });
+    </script>
+    
+</body>
+</html>
