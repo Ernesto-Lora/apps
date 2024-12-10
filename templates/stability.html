@@ -43,13 +43,14 @@
         {% if svg_base64 %}
         <div class="output-section">
             <img id="roll-center-image" src="data:image/svg+xml;base64,{{ svg_base64 }}" alt="Suspension Image">
-            <p>The <span style="color: green;">Roll Center</span> is on: x = {{ roll_center_x }}, y = {{ roll_center_y }}</p>
-            <p>The <span style="color: blue;">Gravity Center</span> is on: x = {{ gravity_center_x }}, y = {{ gravity_center_y }}</p>
+            <p>The <span style="color: green;">Roll Center</span> is on: x = {{ roll_center_x }} m, y = {{ roll_center_y }} m.</p>
+            <p>The <span style="color: blue;">Gravity Center</span> is on: x = {{ gravity_center_x }} m, y = {{ gravity_center_y }} m.</p>
             <p>The <span style="color: red;">Maximum Angle</span> is: {{ max_rotation }} °</p>
+            <p>The <span style="color: black;">Distance</span> between the Roll Center and Gravity Center is: {{distance}} m.</p>
         </div>
         {% endif %}
 
-
+        <h2>Maximum Velocities</h2>
         <form method="post">
             <div id="Radius">
                 {% csrf_token %}
@@ -58,25 +59,28 @@
             <button type="submit">Max Velocities</button>
         </form>
     
-        {% if max_speed_angle %}
+        {% if max_speed_weigth_modified %}
             <div class="output-section">
-                <p>When rounding a curve of raius R The Maximum velocity with the Roll center Modification is = {{ max_speed_weigth_modified }} km/h</p>
-                
+                <p>When rounding a curve with a radius R = {{radius}}, the maximum velocity that can be achieved without rolling over is {{ max_speed_weigth_modified }} km/h.</p>
             </div>
         {% endif %}
 
+        <h2>Chassis Rotation when rounding a curve</h2>
         <form method="post">
             <div id="velocity">
                 {% csrf_token %}
                 {{ velocity_form.as_p }}
             </div>
-            <button type="submit">Max Velocities</button>
+            <button type="submit">Chassis Rotation</button>
         </form>
         
         {% if rotation_curve %}
             <div class="output-section">
-                <p>The rotation with that velocity v and a Rigidity k 
-                    in a curve of radius R is {{ rotation_curve }} °</p>
+                <p>
+                    When navigating a curve with a radius of R = {{radius}} m 
+                    and a velocity of v = {{velocity}} km/h, with the car's suspension
+                     having a rigidity of k = {{k}} N/m, the chassis experiences a rotational
+                      tilt of {{rotation_curve}}° due to the lateral forces acting on the vehicle.</p>
             </div>
         {% endif %}
     </div>
