@@ -24,107 +24,31 @@ from .Modules.rollover import rollover
 
 from .views_module.process_object_and_render import process_object_and_render
 from .views_module.process_geometry import process_geometry
+from .views_module.process_angle import process_angle
+from .views_module.curve_max_velocity import curve_max_velocity
+from .views_module.curve_chassis_rotation import curve_chassis_rotation
+from .views_module.process_components import process_components
 
 
 
 def app2(request):
     max_rotation = request.session.get('max_rotation')  # Retrieve max_rotation
-    object_data = request.session.get('object_data')  # Get stored object data
-    angle_session = request.session.get('angle')
-    roll_center = request.session.get('roll_center_0')
     
     if request.method == 'POST':
         if 'hu' in request.POST:
             return process_geometry(request)
             
-            
         elif 'angle' in request.POST:
-            angle_form = thetaForm(max_rotation=max_rotation, data=request.POST)
-            
-            if angle_form.is_valid() and object_data:
-                # Recreate object and process
-                object = system_object(**object_data)
-
-                object.theta = np.deg2rad(angle_form.cleaned_data['angle'])
-                request.session['angle'] = np.deg2rad(angle_form.cleaned_data['angle'])   
-
-                return process_object_and_render(request, object, max_rotation ,
-                        'stability.html',
-                    {'geometry_form': SuspensionForm(),
-                    'angle_form': angle_form,
-                    'radius_form': radius_form,
-                    'velocity_form': velocity_form,
-                    })
+            return process_angle(request)
             
         elif 'radius' in request.POST:
-            radius_form_data = radius_form(request.POST)
-            
-            if radius_form_data.is_valid() and object_data:
-                # Recreate object and process
-                radius = radius_form_data.cleaned_data['radius']
-                distance = radius_form_data.cleaned_data['distance']
-                object = system_object(**object_data)
-                object.theta = angle_session
-
-                gravity_center_object = gravity_center(pd.read_excel("static/stability/components.xlsx"))
-
-                chassis_stiffnes_i = chassis_stiffness(D = object.D, kw=12000)
-                #roll_center = ComputeRollCenter(object)
-                #roll_center = np.array([0,0,0])
-
-                roll_over = rollover(gravity_center_object,
-                                      np.array(roll_center), max_rotation, object.D,
-                                     chassis_stiffnes_i)
-                print(radius)
-                max1 = roll_over.max_speed_weigth_modified(R=radius, distance=distance)
-                #max2 = roll_over.max_speed_angle(R=radius)
-
-                return process_object_and_render(request, object, max_rotation ,
-                        'stability.html',
-                    {'geometry_form': SuspensionForm(),
-                    'angle_form': thetaForm(max_rotation=max_rotation),
-                    'radius_form': radius_form,
-                    'velocity_form': velocity_form,
-                    'max_speed_weigth_modified': round(max1*3.6),
-                    'radius': radius})
+            return curve_max_velocity(request)
             
         elif 'velocity' in request.POST:
-            velocity_form_data = velocity_form(request.POST)
-            
-            if velocity_form_data.is_valid() and object_data:
-                # Recreate object and process
-                velocity = velocity_form_data.cleaned_data['velocity']
-                k = velocity_form_data.cleaned_data['k']
-                radius = velocity_form_data.cleaned_data['radius_for_rotation']
-                distance = velocity_form_data.cleaned_data['distance']
-                
-                object = system_object(**object_data)
-                object.theta = angle_session
-
-                gravity_center_object = gravity_center(pd.read_excel("static/stability/components.xlsx"))
-                chassis_stiffnes_i = chassis_stiffness(D = object.D, kw=k)
-                #roll_center = ComputeRollCenter(object)
-                #roll_center = np.array([0,0,0])
-
-                roll_over = rollover(gravity_center_object,
-                                      np.array(roll_center), max_rotation, object.D,
-                                     chassis_stiffnes_i)
-                
-                rotation_curve = roll_over.rotation_curve(R = radius, v=velocity, distance=distance)
-                max1 = roll_over.max_speed_weigth_modified(R= radius)
-
-                return process_object_and_render(request, object, max_rotation ,
-                        'stability.html',
-                    {'geometry_form': SuspensionForm(),
-                    'angle_form': thetaForm(max_rotation=max_rotation),
-                    'radius_form': radius_form,
-                    'velocity_form': velocity_form,
-                    'max_speed_weigth_modified': round(max1*3.6),
-                    'rotation_curve': round(np.rad2deg(rotation_curve),3),
-                    'velocity': velocity,
-                    'k': k,
-                    'radius': radius},
-                    )
+            return curve_chassis_rotation(request)
+        
+        elif request.content_type == 'application/json':
+            process_components(request)
             
     return render(request, 'stability.html', {
         'geometry_form': SuspensionForm(),

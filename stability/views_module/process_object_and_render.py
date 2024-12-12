@@ -24,10 +24,18 @@ def process_object_and_render(request, object, max_rotation, template, context):
     fig, ax = plt.subplots()
     omega(object)
     roll_center = ComputeRollCenter(object)
-    gravity_center_object = gravity_center(pd.read_excel("static/stability/components.xlsx"))
+
+    data = request.session.get('car_components')
+    components = data.get('components', [])
+    column_names = ["component_name", "mass", "x", "y", "z"]
+    df = pd.DataFrame(components, columns=column_names)
+
+    gravity_center_object = gravity_center( df )
     gravity_center_val = gravity_center_object.gravity_center()
+    print(gravity_center_val)
     distance = compute_distance(roll_center, gravity_center_val)
-    frontStability.plot_system(object, fig, ax)
+
+    frontStability.plot_system(object, gravity_center_val, fig, ax)
     plt.gca().set_aspect('equal', adjustable='box')
     plt.ylim(-0.1, 0.8)
     plt.xlim(-1.2, 1.2)
@@ -50,3 +58,4 @@ def process_object_and_render(request, object, max_rotation, template, context):
         'distance': round(distance, 3)
     })
     return render(request, template, context)
+

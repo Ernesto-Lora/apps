@@ -16,14 +16,12 @@ from .gravityCenter import gravity_center
 from .lines.show_chassis_angle import show_chassis_angle
 from .lines.show_line import show_line
 
-def plot_system(object, fig, ax):
+def plot_system(object, gravity_center_val, fig, ax):
     showTiresFigure(object, fig, ax)
     showWishboneChasis(object, fig, ax)
     show_chassis_angle(object, fig, ax)
 
     roll_center = ComputeRollCenter(object)
-    gravity_center_object = gravity_center(pd.read_excel("static/stability/components.xlsx"))
-    gravity_center_val = gravity_center_object.gravity_center()
     
     show_circle(roll_center, "green", fig, ax) #roll center
     show_circle(gravity_center_val, "blue", fig, ax) #gravity center
