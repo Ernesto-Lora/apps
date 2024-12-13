@@ -18,11 +18,11 @@ from django.contrib import admin
 from django.urls import path
 import stability
 import springUTS.views
-import stability.views
+import stability.main
 import stability.views_module.process_components as components
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('stability/', stability.views.app2, name = 'stability'),
+    path('stability/', stability.main.main, name = 'stability'),
     path('springUTS/', springUTS.views.app, name = 'springUTS')
 ]

@@ -13,20 +13,28 @@ from ..Modules.lines.system_object import system_object
 from ..views_module.process_object_and_render import process_object_and_render
 
 def process_angle(request):
+    """
+    Process the angle form submitted from the front-end and update the session with the computed angle.
+
+    Parameters
+    ----------
+    request : HttpRequest
+        The HTTP request object containing metadata about the request and POST data.
+
+    Returns
+    -------
+    HttpResponse
+        Renders the stability page with updated angle and related calculations.
+    """
     max_rotation = request.session.get('max_rotation')
-    object_data = request.session.get('object_data') 
     angle_form = thetaForm(max_rotation=max_rotation, data=request.POST)
-    if angle_form.is_valid() and object_data:
+    if angle_form.is_valid():
         # Recreate object and process
-        object = system_object(**object_data)
+        request.session['angle'] = np.deg2rad(angle_form.cleaned_data['angle'])
 
-        object.theta = np.deg2rad(angle_form.cleaned_data['angle'])
-        request.session['angle'] = np.deg2rad(angle_form.cleaned_data['angle'])   
-
-        return process_object_and_render(request, object, max_rotation ,
-                'stability.html',
-            {'geometry_form': SuspensionForm(),
-            'angle_form': angle_form,
-            'radius_form': radius_form,
-            'velocity_form': velocity_form,
-            })
+        return process_object_and_render(request,
+                                         'stability.html',
+                                         {'geometry_form': SuspensionForm(),
+                                          'angle_form': angle_form,
+                                          'radius_form': radius_form,
+                                          'velocity_form': velocity_form})

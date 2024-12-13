@@ -27,43 +27,52 @@ from ..views_module.process_geometry import process_geometry
 from ..views_module.process_angle import process_angle
 
 def curve_chassis_rotation(request):
+    """
+    Process the velocity form submitted from the front-end and compute chassis rotation based on the inputs.
+
+    Parameters
+    ----------
+    request : HttpRequest
+        The HTTP request object containing metadata about the request and POST data.
+
+    Returns
+    -------
+    HttpResponse
+        Renders the stability page with updated chassis rotation and velocity calculations.
+    """
     velocity_form_data = velocity_form(request.POST)
-    
+
     if velocity_form_data.is_valid():
+        # Retrieve session data
         max_rotation = request.session.get('max_rotation')
-        object_data = request.session.get('object_data')
-        angle_session = request.session.get('angle')
-        roll_center = request.session.get('roll_center_0')
-        # Recreate object and process
+        D = request.session.get('D')
+        roll_center = request.session.get('roll_center')
+        gravity_center_val = request.session.get('gravity_center_val')
+        distance = request.session.get('distance')
+        total_mass = request.session.get('total_mass')
+
+        # Form data
         velocity = velocity_form_data.cleaned_data['velocity']
         k = velocity_form_data.cleaned_data['k']
         radius = velocity_form_data.cleaned_data['radius_for_rotation']
         distance = velocity_form_data.cleaned_data['distance']
-        
-        object = system_object(**object_data)
-        object.theta = angle_session
 
-        gravity_center_object = gravity_center(pd.read_excel("static/stability/components.xlsx"))
-        chassis_stiffnes_i = chassis_stiffness(D = object.D, kw=k)
-        #roll_center = ComputeRollCenter(object)
-        #roll_center = np.array([0,0,0])
+        chassis_stiffnes_i = chassis_stiffness(D=D, kw=k)
+        print(f'the total mass is: {total_mass}')
+        roll_over = rollover(gravity_center_val,total_mass,
+                             roll_center,distance, max_rotation, D, chassis_stiffnes_i)       
 
-        roll_over = rollover(gravity_center_object,
-                                np.array(roll_center), max_rotation, object.D,
-                                chassis_stiffnes_i)
-        
-        rotation_curve = roll_over.rotation_curve(R = radius, v=velocity, distance=distance)
-        max1 = roll_over.max_speed_weigth_modified(R= radius)
+        rotation_curve = roll_over.rotation_curve(R=radius, v=velocity, distance=distance)
+        max1 = roll_over.max_speed_weigth_modified(R=radius)
 
-        return process_object_and_render(request, object, max_rotation ,
-                'stability.html',
-            {'geometry_form': SuspensionForm(),
-            'angle_form': thetaForm(max_rotation=max_rotation),
-            'radius_form': radius_form,
-            'velocity_form': velocity_form,
-            'max_speed_weigth_modified': round(max1*3.6),
-            'rotation_curve': round(np.rad2deg(rotation_curve),3),
-            'velocity': velocity,
-            'k': k,
-            'radius': radius},
-            )
+        return process_object_and_render(request,
+                                         'stability.html',
+                                         {'geometry_form': SuspensionForm(),
+                                          'angle_form': thetaForm(max_rotation=max_rotation),
+                                          'radius_form': radius_form,
+                                          'velocity_form': velocity_form,
+                                          'max_speed_weigth_modified': round(max1 * 3.6),
+                                          'rotation_curve': round(np.rad2deg(rotation_curve), 3),
+                                          'velocity': velocity,
+                                          'k': k,
+                                          'radius': radius})

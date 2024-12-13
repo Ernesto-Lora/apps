@@ -3,16 +3,25 @@ from django.shortcuts import render
 import json
 import pandas as pd
 from ..Modules.gravityCenter import gravity_center
+import numpy as np
+
+def compute_distance(x,y):
+    z = x-y
+    return  np.linalg.norm(z[:2])
 
 def process_components(request):
-    data = json.loads(request.body)
-    request.session['car_components'] = data
+    roll_center = np.array(request.session.get('roll_center'))
+    data = json.loads(request.body) #Data send from front-end
+    components = data.get('components', [])
+    column_names = ["component_name", "mass", "x", "y", "z"]
+    df = pd.DataFrame(components, columns=column_names)
 
-    # components = data.get('components', [])
-    # # Process the components data
-    # column_names = ["component_name", "mass", "x", "y", "z"]
-    # df = pd.DataFrame(components, columns=column_names)
-    # gravity_center_object = gravity_center(df)
-    # print(gravity_center_object.gravity_center())
+    # Compute gravity center and distance
+    gravity_center_object = gravity_center(df)
+    gravity_center_val = gravity_center_object.gravity_center()
+    distance = compute_distance(roll_center, gravity_center_val)
     
-    # return render(request, 'components_form.html', {})
+    request.session['distance'] = float(distance)
+    request.session['gravity_center_val'] = gravity_center_val.tolist()
+    request.session['total_mass'] = float(gravity_center_object.totalMass())
+    request.session['table_data'] = data['components']  # Save to session

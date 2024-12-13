@@ -28,37 +28,46 @@ from ..views_module.process_angle import process_angle
 
 
 def curve_max_velocity(request):
+    """
+    Process the radius form submitted from the front-end and calculate the maximum velocity with weight modification.
+
+    Parameters
+    ----------
+    request : HttpRequest
+        The HTTP request object containing metadata about the request and POST data.
+
+    Returns
+    -------
+    HttpResponse
+        Renders the stability page with updated radius and maximum velocity calculations.
+    """
     radius_form_data = radius_form(request.POST)
-    
+
     if radius_form_data.is_valid():
+        # Get session data
         max_rotation = request.session.get('max_rotation')
-        object_data = request.session.get('object_data')
-        angle_session = request.session.get('angle')
-        roll_center = request.session.get('roll_center_0')
+        D = request.session.get('D')
+        roll_center = request.session.get('roll_center')
+        gravity_center_val = request.session.get('gravity_center_val')
+        distance = request.session.get('distance')
+        total_mass = request.session.get('total_mass')
+
         # Recreate object and process
         radius = radius_form_data.cleaned_data['radius']
         distance = radius_form_data.cleaned_data['distance']
-        object = system_object(**object_data)
-        object.theta = angle_session
 
-        gravity_center_object = gravity_center(pd.read_excel("static/stability/components.xlsx"))
+        chassis_stiffnes_i = chassis_stiffness(D= D, kw=12000)
 
-        chassis_stiffnes_i = chassis_stiffness(D = object.D, kw=12000)
-        #roll_center = ComputeRollCenter(object)
-        #roll_center = np.array([0,0,0])
+        roll_over = rollover(gravity_center_val,total_mass,
+                             roll_center,distance, max_rotation, D, chassis_stiffnes_i)
 
-        roll_over = rollover(gravity_center_object,
-                                np.array(roll_center), max_rotation, object.D,
-                                chassis_stiffnes_i)
-        print(radius)
         max1 = roll_over.max_speed_weigth_modified(R=radius, distance=distance)
-        #max2 = roll_over.max_speed_angle(R=radius)
 
-        return process_object_and_render(request, object, max_rotation ,
-                'stability.html',
-            {'geometry_form': SuspensionForm(),
-            'angle_form': thetaForm(max_rotation=max_rotation),
-            'radius_form': radius_form,
-            'velocity_form': velocity_form,
-            'max_speed_weigth_modified': round(max1*3.6),
-            'radius': radius})
+        return process_object_and_render(request,
+                                         'stability.html',
+                                         {'geometry_form': SuspensionForm(),
+                                          'angle_form': thetaForm(max_rotation=max_rotation),
+                                          'radius_form': radius_form,
+                                          'velocity_form': velocity_form,
+                                          'max_speed_weigth_modified': round(max1 * 3.6),
+                                          'radius': radius})
