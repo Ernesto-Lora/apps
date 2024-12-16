@@ -28,7 +28,8 @@ from ..views_module.process_angle import process_angle
 
 def curve_chassis_rotation(request):
     """
-    Process the velocity form submitted from the front-end and compute chassis rotation based on the inputs.
+    Process the velocity form submitted
+    from the front-end and compute chassis rotation based on the inputs.
 
     Parameters
     ----------

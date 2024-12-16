@@ -51,7 +51,10 @@ def process_object_and_render(request, template, context):
     angle_session = request.session.get('angle')
     roll_center = request.session.get('roll_center')
     gravity_center_val = request.session.get('gravity_center_val')
-    distance = request.session.get('distance')
+
+    distance = compute_distance(np.array(roll_center), np.array(gravity_center_val))
+    request.session['distance'] = float(distance)
+    #distance = request.session.get('distance')
 
     # Initialize plot
     fig, ax = plt.subplots()
@@ -84,6 +87,7 @@ def process_object_and_render(request, template, context):
         'max_rotation': round(np.rad2deg(max_rotation), 3),
         'distance': round(distance, 3)
     })
+    
     table_data = request.session.get('table_data')
     context.update({
         'table_data': json.dumps(table_data)  # Pass data as JSON to the template

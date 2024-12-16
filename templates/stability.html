@@ -98,31 +98,22 @@
 
     <script>
         const container = document.getElementById('handsontable');
+
+        const initialData = JSON.parse('{{ table_data|escapejs }}');
         const hot = new Handsontable(container, {
-            data: [
-                ['Front bumper', 13, 0, 0.3, 0],
-                ['Radiator', 60, 0, 0.4, 0.3],
-                ['engine/trans', 85, 0.5, 0.4, 1.1],
-                ['Fuel tanks + luggage', 65, 0.5, 0.45, 3.3],
-                ['Luggage', 50, 0, 0.5, 3.85],
-                ['Rear Bumper', 14, 0, 0.3, 4.2],
-                ['Front Left Corner', 90, -0.7, 0.3, 0],
-                ['Front Right Corner', 90, 0.7, 0.3, 0],
-                ['Rear Left Corner', 125, -0.7, 0.3, 4],
-                ['Rear Right Corner', 125, 0.7, 0.3, 4],
-                ['Caja sonido', 2, 0.3, 0.4, 4]
-            ],
-            colHeaders: ['Name', 'Mass(kg)', 'X', 'Y', 'Z'],
-            rowHeaders: true,
-            columns: [
-                { type: 'text' },
-                { type: 'numeric' },
-                { type: 'numeric' },
-                { type: 'numeric' },
-                { type: 'numeric' },
-            ],
-            licenseKey: 'non-commercial-and-evaluation', // For non-commercial use
+        data: initialData,
+        colHeaders: ['Name', 'Mass(kg)', 'X', 'Y', 'Z'],
+        rowHeaders: true,
+        columns: [
+            { type: 'text' },
+            { type: 'numeric' },
+            { type: 'numeric' },
+            { type: 'numeric' },
+            { type: 'numeric' },
+        ],
+        licenseKey: 'non-commercial-and-evaluation', // For non-commercial use
         });
+        
 
         // Add Row Button
         document.getElementById('addRow').addEventListener('click', () => {

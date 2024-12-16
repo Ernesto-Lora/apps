@@ -53,6 +53,8 @@ def process_geometry(request):
             D=D, Dtw=Dtw, ht=ht, hu=hu, hb=hb, lu=lu, lb=lb,
             philu=philu, philb=philb, phiru=phiru, phirb=phirb
         )
+        angle = request.session.get('angle')
+        object.theta = angle
 
         max_rotation = maxRotation(object)
         roll_center = ComputeRollCenter(object)

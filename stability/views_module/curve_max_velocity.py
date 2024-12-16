@@ -29,7 +29,8 @@ from ..views_module.process_angle import process_angle
 
 def curve_max_velocity(request):
     """
-    Process the radius form submitted from the front-end and calculate the maximum velocity with weight modification.
+    Recive and process the curve radius from the front-end and calculate
+      the maximum velocity the car can handdle with out rolling over.
 
     Parameters
     ----------

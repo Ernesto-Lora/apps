@@ -14,7 +14,8 @@ from ..views_module.process_object_and_render import process_object_and_render
 
 def process_angle(request):
     """
-    Process the angle form submitted from the front-end and update the session with the computed angle.
+    Process the angle form submitted from the front-end
+      and update the session with the computed angle.
 
     Parameters
     ----------
