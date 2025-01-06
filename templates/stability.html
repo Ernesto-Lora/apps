@@ -12,54 +12,67 @@
 </head>
 <body>
     <h1>Rolling Center</h1>
-    <div id="content">
-        <!-- Form for Input Data -->
-        <form method="post">
-            <div id="geometry">
-                {% csrf_token %}
-                {{ geometry_form.as_p }}
+    <div class="content">
+        <!-- Left Column -->
+        <div id="left-column">
+            
+            <!-- Geometry Section -->
+            
+            <form method="post">
+                <div id="geometry">
+                    <h2>Geometry</h2>
+                    {% csrf_token %}
+                    {{ geometry_form.as_p }}
+                </div>
+                <button type="submit">Generate Chassis</button>
+            </form>
+    
+            <!-- Car Components Section -->
+            <div id="car-components">
+                <h2>Input Car Components</h2>
+                <div id="handsontable"></div>
+                <button id="addRow">Add Row</button>
+                <button id="submit">Submit</button>
             </div>
-            <button type="submit">Generate</button>
-        </form>
-        <div>
-            <h1>Input Car Components</h1>
-    <div id="handsontable"></div>
-    <button id="addRow">Add Row</button>
-    <button id="submit">Submit</button>
         </div>
+    
+        <!-- Right Column -->
+        <div id="right-column">
 
-        <form method="post">
-            <div id="geometry">
-                {% csrf_token %}
-                {{ angle_form.as_p }}
+            <!-- Schema Image Section -->
+            <button id="toggle-button" onclick="toggleSchema()">Show Schema</button>
+            <div id="schema-container">
+                <img src="{% static 'stability/schema.svg' %}" alt="Rolling Center Schema">
             </div>
-            <button type="submit">Change Angle</button>
-        </form>
-        
-        {% if warnings %}
-            <div><h2 style="color: red;">{{ warnings }}</h2></div>
-        {% endif %}
-
-        <!-- Toggle Button for Schema Image -->
-        <button id="toggle-button" onclick="toggleSchema()">Show Schema</button>
-
-        <!-- Schema Image Container -->
-        <div id="schema-container">
-            <img src="{% static 'stability/schema.svg' %}" alt="Rolling Center Schema">
-        </div>
-
-        <!-- Display Calculated Image and Results -->
+            
         {% if svg_base64 %}
-        <div class="output-section">
-            <img id="roll-center-image" src="data:image/svg+xml;base64,{{ svg_base64 }}" alt="Suspension Image">
-            <p>The <span style="color: green;">Roll Center</span> is on: x = {{ roll_center_x }} m, y = {{ roll_center_y }} m.</p>
-            <p>The <span style="color: blue;">Gravity Center</span> is on: x = {{ gravity_center_x }} m, y = {{ gravity_center_y }} m.</p>
-            <p>The <span style="color: red;">Maximum Angle</span> is: {{ max_rotation }} °</p>
-            <p>The <span style="color: black;">Distance</span> between the Roll Center and Gravity Center is: {{distance}} m.</p>
-        </div>
+            <!-- Output Section -->
+            <div class="output-section">
+            
+            
+                <!-- Rotate Chassis Section -->
+            <form method="post">
+                <div id="rotate-chassis">
+                    {% csrf_token %}
+                    {{ angle_form.as_p }}
+                </div>
+                <button type="submit">Rotate Chassis</button>
+            </form>
+                <img id="roll-center-image" src="data:image/svg+xml;base64,{{ svg_base64 }}" alt="Suspension Image">
+                <p>The <span style="color: green;">Roll Center</span> is on: x = {{ roll_center_x }} m, y = {{ roll_center_y }} m.</p>
+                <p>The <span style="color: blue;">Gravity Center</span> is on: x = {{ gravity_center_x }} m, y = {{ gravity_center_y }} m.</p>
+                <p>The <span style="color: red;">Maximum Angle</span> is: {{ max_rotation }} °</p>
+                <p>The <span style="color: black;">Distance</span> between the Roll Center and Gravity Center is: {{distance}} m.</p>
+            
+            
+            </div>
         {% endif %}
+        </div>
+    </div>
 
-        <h2>Maximum Velocities</h2>
+    <div class="content">
+        <div id="max-velocities">
+            <h2>Maximum Velocities</h2>
         <form method="post">
             <div id="Radius">
                 {% csrf_token %}
@@ -73,8 +86,10 @@
                 <p>When rounding a curve with a radius R = {{radius}}, the maximum velocity that can be achieved without rolling over is {{ max_speed_weigth_modified }} km/h.</p>
             </div>
         {% endif %}
-
-        <h2>Chassis Rotation when rounding a curve</h2>
+        </div>
+        
+        <div id="chassis-rotation">
+            <h2>Chassis Rotation when rounding a curve</h2>
         <form method="post">
             <div id="velocity">
                 {% csrf_token %}
@@ -92,9 +107,14 @@
                       tilt of {{rotation_curve}}° due to the lateral forces acting on the vehicle.</p>
             </div>
         {% endif %}
+        </div>
+
+        
     </div>
 
     </div>
+    
+
 
     <script>
         const container = document.getElementById('handsontable');
@@ -122,18 +142,33 @@
 
         // Submit Button
         document.getElementById('submit').addEventListener('click', () => {
-            const data = hot.getData();
-            fetch('/stability/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-                body: JSON.stringify({ components: data }),
-            }).then(response => response.json()).then(result => {
-                console.log(result);
-            });
+            const data = hot.getData(); // Get data from Handsontable
+
+            // Create a hidden form and append JSON data as a field
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/stability/';
+            form.style.display = 'none';
+
+            // Add CSRF token as a hidden input
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = '{{ csrf_token }}';
+            form.appendChild(csrfInput);
+
+            // Add JSON data as another hidden input
+            const jsonInput = document.createElement('input');
+            jsonInput.type = 'hidden';
+            jsonInput.name = 'components';
+            jsonInput.value = JSON.stringify(data); // Serialize the JSON data
+            form.appendChild(jsonInput);
+
+            // Append form to the document and submit
+            document.body.appendChild(form);
+            form.submit();
         });
+
 
         // JavaScript function to toggle schema visibility
         function toggleSchema() {
@@ -164,8 +199,6 @@
 
         // Listen for changes
         darkModeMediaQuery.addEventListener("change", updateTheme);
-
-
     </script>
 </body>
 </html>

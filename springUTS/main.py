@@ -8,7 +8,7 @@ import pandas as pd
 from springUTS.forms import springUTS_Form
 
 
-def app(request):
+def main(request):
     if request.method == 'POST':
         form = springUTS_Form(request.POST)
         if form.is_valid():
@@ -42,7 +42,8 @@ def app(request):
                                     'error2': round(error2, 2),
                                     'error3': round(error3, 2),
                                     'error4': round(error4, 2),
-                                    'image_base64': image_base64
+                                    'otra': otra,
+                                    'image_base64': image_base64,
                                 })
     else:
         form = springUTS_Form()

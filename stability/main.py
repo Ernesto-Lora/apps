@@ -69,6 +69,7 @@ def main(request):
         request.session['total_mass'] = float(gravity_center_object.totalMass())
     
     if request.method == 'POST':
+        print(f"Content-Type: {request.content_type}")
         # Handle different POST requests
         if 'hu' in request.POST:
             return process_geometry(request)
@@ -78,8 +79,10 @@ def main(request):
             return curve_max_velocity(request)
         elif 'velocity' in request.POST:
             return curve_chassis_rotation(request)
-        elif request.content_type == 'application/json':
+        elif 'application/x-www-form-urlencoded' in request.content_type:
+            print("Componentes del carro")
             return process_components(request)
+
     
     # Pass serialized table_data to the template
     return render(request, 'stability.html', {

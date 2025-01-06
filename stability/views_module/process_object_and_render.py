@@ -54,15 +54,14 @@ def process_object_and_render(request, template, context):
 
     distance = compute_distance(np.array(roll_center), np.array(gravity_center_val))
     request.session['distance'] = float(distance)
-    #distance = request.session.get('distance')
 
     # Initialize plot
     fig, ax = plt.subplots()
 
-    # Perform object-specific processing
+    #Create system object, set theta as the theta inputed and compute omega  
     object = system_object(**object_data)
-    omega(object)
     object.theta = angle_session
+    omega(object)
 
     # Plot system and configure plot settings
     frontStability.plot_system(object, gravity_center_val, fig, ax)

@@ -17,12 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 import stability
-import springUTS.views
+import springUTS.main
 import stability.main
-import stability.views_module.process_components as components
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('stability/', stability.main.main, name = 'stability'),
-    path('springUTS/', springUTS.views.app, name = 'springUTS')
+    path('springUTS/', springUTS.main.main, name = 'springUTS')
 ]
