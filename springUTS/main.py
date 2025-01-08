@@ -42,7 +42,6 @@ def main(request):
                                     'error2': round(error2, 2),
                                     'error3': round(error3, 2),
                                     'error4': round(error4, 2),
-                                    'otra': otra,
                                     'image_base64': image_base64,
                                 })
     else:
