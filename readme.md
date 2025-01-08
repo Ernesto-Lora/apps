@@ -220,3 +220,82 @@ To show the user the result, the HTML must be specified to receive that result.
 ```
 
 The `if` clause ensures that results are displayed only if they are sent.
+
+# Plot Generation (send an image)
+
+The approach taken for visualizing the system was to use `matplotlib` to create the plot and then convert it into a binary format. The relevant code for this process is in `stability/views_module/process_object_and_render.py`.
+
+### Overview of `process_object_and_render()`
+
+The `process_object_and_render()` function performs the following steps:
+
+1. **Initialize Plot**  
+   A `matplotlib` plot is initialized.
+
+2. **Generate Plots**  
+   The required system plots are created using the provided data and modules of the project.
+
+3. **Convert Plot to Binary**  
+   The plot is saved in SVG format and encoded into a Base64 string. This string is stored in the `svg_base64` variable.
+
+4. **Send to Frontend**  
+   The `svg_base64` variable is passed to the frontend via the context (is a dictionary of variables to be send).
+
+### Code Snippet
+
+```python
+def process_object_and_render(request, template, context):
+
+    max_rotation = request.session.get('max_rotation')
+    object_data = request.session.get('object_data')
+    angle_session = request.session.get('angle')
+    roll_center = request.session.get('roll_center')
+    gravity_center_val = request.session.get('gravity_center_val')
+
+    distance = compute_distance(np.array(roll_center), np.array(gravity_center_val))
+    request.session['distance'] = float(distance)
+
+    # Initialize plot
+    fig, ax = plt.subplots()
+
+    # Create system object, set theta as the inputted value, and compute omega
+    object = system_object(**object_data)
+    object.theta = angle_session
+    omega(object)
+
+    # Plot system and configure plot settings
+    frontStability.plot_system(object, gravity_center_val, fig, ax)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.ylim(-0.1, 0.8)
+    plt.xlim(-1.2, 1.2)
+
+    # Save plot as SVG and encode in Base64
+    buffer = io.BytesIO()
+    plt.savefig(buffer, bbox_inches='tight', format='svg')
+    buffer.seek(0)
+    svg_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+    buffer.close()
+
+    # Update context with computed values and SVG data
+    context.update({
+        'svg_base64': svg_base64,
+        'roll_center_x': round(roll_center[0], 3),
+        'roll_center_y': round(roll_center[1], 3),
+        'gravity_center_x': round(gravity_center_val[0], 3),
+        'gravity_center_y': round(gravity_center_val[1], 3),
+        'max_rotation': round(np.rad2deg(max_rotation), 3),
+        'distance': round(distance, 3)
+    })
+
+    table_data = request.session.get('table_data')
+    context.update({
+        'table_data': json.dumps(table_data)  # Pass data as JSON to the template
+    })
+
+    # Render and return the response
+    return render(request, template, context)
+
+After the base64 image is send, the line 61, of stability.html template shows how the image is received:
+
+<img id="roll-center-image" src="data:image/svg+xml;base64,{{ svg_base64 }}" alt="Suspension Image">
+```
