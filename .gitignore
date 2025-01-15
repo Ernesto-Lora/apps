@@ -1,0 +1,11 @@
+*.jl~
+*.dat~
+*.txt~
+*.gitignore~
+#main.jl#
+.#main.jl
+#README.md#
+#README.md
+datos.dat
+translape.jl
+critical.dat
