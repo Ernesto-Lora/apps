@@ -19,9 +19,11 @@ from django.urls import path
 import stability
 import springUTS.main
 import stability.main
+import example_app.main
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('stability/', stability.main.main, name = 'stability'),
-    path('springUTS/', springUTS.main.main, name = 'springUTS')
+    path('springUTS/', springUTS.main.main, name = 'springUTS'),
+    path('example/', example_app.main.main, name = 'example' )
 ]

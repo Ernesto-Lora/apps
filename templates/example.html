@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>example</title>
+    <!-- <link rel="stylesheet" href="{% static 'css/styles.css' %}"> -->
+   
+</head>
+<body>
+    <div id="container">
+        <h1>Spring UTS Analysis</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Generate Analysis</button>
+        </form>
+
+        {% if result %}
+        <p>The slope is: {{result}}</p>
+        {% endif %}
+
+        {% if image_base64 %}
+        <div class="image-container">
+            <h3>Slop plot.</h3>
+            <img src="data:image/png;base64,{{ image_base64 }}" alt="example Image">
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
