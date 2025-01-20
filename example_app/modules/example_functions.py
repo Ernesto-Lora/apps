@@ -8,17 +8,18 @@ class example_class:
     def __init__(self, example):
         self.example = example
 
-    def multiply(self):
-        self.example *= 2
-    def result(self):
-        return self.example
+    def double(self):
+        return (self.example * 2)
+
+    def multiply(self, num):
+        return (self.double() * num)
 
     def plot(self):
         self.multiply()
         x = np.linspace(0,10)
         y = self.example*x
         plt.plot(x,y)
-        plt.show()
+        
         # Save the plot to a BytesIO object
         buffer = io.BytesIO()
         plt.savefig(buffer, format='png')

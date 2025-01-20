@@ -75,6 +75,7 @@ def process_object_and_render(request, template, context):
     buffer.seek(0)
     svg_base64 = base64.b64encode(buffer.read()).decode('utf-8')
     buffer.close()
+    plt.close()
 
     # Update context with computed values and SVG data
     context.update({

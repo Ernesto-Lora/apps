@@ -117,4 +117,5 @@ class springUTS:
         # Convert to base64 for embedding in HTML
         image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
         buffer.close()
+        plt.close()
         return image_base64

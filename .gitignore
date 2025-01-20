@@ -9,3 +9,6 @@
 datos.dat
 translape.jl
 critical.dat
+
+# Cache directories
+__pycache__/

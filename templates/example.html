@@ -9,22 +9,26 @@
 </head>
 <body>
     <div id="container">
-        <h1>Spring UTS Analysis</h1>
+        <h1>Example app</h1>
+
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">Generate Analysis</button>
+            <button type="submit">Double</button>
+        </form>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form2.as_p }}
+            <button type="submit">Multiply the result</button>
         </form>
 
         {% if result %}
-        <p>The slope is: {{result}}</p>
+        <p>The double of the example variable is: {{result}}</p>
         {% endif %}
 
-        {% if image_base64 %}
-        <div class="image-container">
-            <h3>Slop plot.</h3>
-            <img src="data:image/png;base64,{{ image_base64 }}" alt="example Image">
-        </div>
+        {% if result2 %}
+        <p>When multiplied by the example variable 2 is: {{result2}}</p>
         {% endif %}
     </div>
 </body>
