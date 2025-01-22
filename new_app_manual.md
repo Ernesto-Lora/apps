@@ -26,7 +26,7 @@ class ExampleForm2(forms.Form):
 
 ## Step 3: Create the Functionality Module
 
-If the functionalities are simple and short to write, the file `models.py` will be sufficient. If the functionalities need to be modularized or extended, create the `modules` directory inside the `example_app` directory.
+Create the `modules` directory inside the `example_app` directory to code the functionalities.
 
 Create `example_functions.py` inside `modules` and write the functionalities and classes as shown below:
 
@@ -84,7 +84,9 @@ def main(request):
 
                 example_object = ExampleClass(example=example)
                 result = example_object.double()
-                request.session['example'] = example
+
+                request.session['example'] = example #save data ...
+
 
                 return render(request, 'example.html', {
                     'form': ExampleForm(),

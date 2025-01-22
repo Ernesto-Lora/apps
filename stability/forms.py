@@ -30,11 +30,11 @@ class thetaForm(forms.Form):
         return angle
     
 class radius_form(forms.Form):
-    distance = forms.FloatField(label='Distance Between Roll center and Gravity Center (m)', initial=0.1)
+    distance = forms.FloatField(label='Distance Between Roll center and Gravity Center (m)', initial=0.3)
     radius = forms.FloatField(label='Curve radius R (m)', initial=400)
 
 class velocity_form(forms.Form):
-    distance = forms.FloatField(label='Distance Between Roll center and Gravity Center (m)', initial=0.1)
+    distance = forms.FloatField(label='Distance Between Roll center and Gravity Center (m)', initial=0.3)
     radius_for_rotation = forms.FloatField(label='Curve radius R (m)', initial=400)
     velocity = forms.FloatField(label=' v (km/h)', initial=100)
     k = forms.FloatField(label=' K (N/m)', initial=12000)
